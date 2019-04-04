@@ -1,9 +1,21 @@
+require "modern-pricing/client/connection"
+require "modern-pricing/client/scores"
+
 module ModernPricing
+
   class Client
-    def initialize(api_key, options = {})
-      raise ArgumentError, "Missing Modern Pricing API key" if api_key.nil? || api_key == ''
-      @api_key = api_key
-      @options = options
+    include HTTParty
+    include ModernPricing::Client::Connection
+    include ModernPricing::Client::Scores
+
+    base_uri "https://modernpricing.com/v1"
+    format :json
+
+    def initialize(access_token = nil)
+      access_token ||= ENV["MODERN_PRICING_API_KEY"]
+      self.class.default_options.merge!(headers: { 'Authorization' => "Token #{access_token}" })
     end
+
   end
+
 end
